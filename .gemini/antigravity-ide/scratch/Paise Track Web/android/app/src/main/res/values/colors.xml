@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="brand_primary">#A9744F</color>
+    <color name="brand_espresso">#3A2618</color>
+    <color name="brand_cream">#FBF6EF</color>
+    <color name="status_bar">#3A2618</color>
+    <color name="nav_bar">#1C120A</color>
+</resources>

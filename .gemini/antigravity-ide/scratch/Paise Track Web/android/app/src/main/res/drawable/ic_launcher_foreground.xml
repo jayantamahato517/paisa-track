@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Circular Badge -->
+    <path
+        android:fillColor="#FBF6EF"
+        android:pathData="M54,54m-38,0a38,38 0 1,1 76,0a38,38 0 1,1 -76,0" />
+    <!-- Rupee Bar 1 -->
+    <path
+        android:fillColor="#A9744F"
+        android:pathData="M38,36h32v5h-32z" />
+    <!-- Rupee Bar 2 -->
+    <path
+        android:fillColor="#A9744F"
+        android:pathData="M38,45h30v5h-30z" />
+    <!-- Rupee Stem & Loop -->
+    <path
+        android:fillColor="#A9744F"
+        android:pathData="M49,36v30c10,0 18,-8 18,-16c0,-8 -7,-12 -14,-12v5c4,0 8,3 8,7c0,5 -5,11 -12,11v-25z" />
+    <!-- Rupee Leg -->
+    <path
+        android:fillColor="#A9744F"
+        android:pathData="M48,60l17,19h7l-17,-20z" />
+</vector>

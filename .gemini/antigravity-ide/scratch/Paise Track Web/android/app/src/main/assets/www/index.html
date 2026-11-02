@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PaisaTrack — Daily Expense Tracker & Net Balance Dashboard</title>
+  <meta name="description"
+    content="Personal daily expense tracker in Indian Rupees (₹) with smart daily spending insights, net balance cash-flow analytics, budget management, interactive charts, and savings goals.">
+
+  <!-- Android & Mobile App Meta Tags -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="theme-color" content="#3A2618">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
+  <!-- Lucide Icons (Local Offline + CDN Fallback) -->
+  <script src="lucide.min.js"></script>
+  <script>if (!window.lucide) { document.write('<script src="https://unpkg.com/lucide@latest"><\/script>'); }</script>
+
+  <!-- Chart.js (Local Offline + CDN Fallback) -->
+  <script src="chart.min.js"></script>
+  <script>if (!window.Chart) { document.write('<script src="https://cdn.jsdelivr.net/npm/chart.js"><\/script>'); }</script>
+
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="light-theme">
+  <!-- Background Ambient Glow Orbs -->
+  <div class="glow-orb orb-1"></div>
+  <div class="glow-orb orb-2"></div>
+
+  <!-- ======================================================================
+       AUTH VIEW (Shown when user is not logged in)
+       ====================================================================== -->
+  <section id="authSection" class="auth-wrapper">
+    <div class="auth-card">
+      <div class="auth-brand-side">
+        <div class="auth-brand-content">
+          <div class="logo-icon large">
+            <i data-lucide="wallet-cards"></i>
+          </div>
+          <h2>Paisa<span>Track</span></h2>
+          <p class="auth-tagline">Master your daily money flow in Indian Rupees (₹). Add your income, record daily
+            expenses, and let PaisaTrack automatically calculate your net balance and daily spending insights.</p>
+
+          <div class="auth-features">
+            <div class="auth-feature-item">
+              <i data-lucide="plus-circle"></i>
+              <div>
+                <strong>Add Money & Auto-Calculate</strong>
+                <span>Deposit money into Bank, UPI, or Cash and watch your net balance automatically update.</span>
+              </div>
+            </div>
+            <div class="auth-feature-item">
+              <i data-lucide="sparkles"></i>
+              <div>
+                <strong>Smart End-of-Day Insights</strong>
+                <span>Instant summaries: "You spent ₹250 today. Biggest expense was food."</span>
+              </div>
+            </div>
+            <div class="auth-feature-item">
+              <i data-lucide="shield-check"></i>
+              <div>
+                <strong>100% Client-Side Privacy</strong>
+                <span>Zero default dummy spending. Everything belongs to you and stays securely on your device.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="auth-form-side">
+        <!-- Auth Form Tabs -->
+        <div class="auth-tabs">
+          <button id="authTabLogin" class="auth-tab-btn active" type="button">Sign In</button>
+          <button id="authTabRegister" class="auth-tab-btn" type="button">Create Account</button>
+        </div>
+
+        <!-- LOGIN FORM -->
+        <form id="loginForm" class="auth-form">
+          <div class="form-header">
+            <h3>Welcome Back</h3>
+            <p>Enter your Gmail / Email to access your financial dashboard</p>
+          </div>
+
+          <div class="form-group">
+            <label for="loginEmail">Email Address (Gmail)</label>
+            <div class="input-with-icon">
+              <i data-lucide="mail"></i>
+              <input type="email" id="loginEmail" required autocomplete="email">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="loginPassword">Password</label>
+            <div class="input-with-icon">
+              <i data-lucide="lock"></i>
+              <input type="password" id="loginPassword" required autocomplete="current-password">
+              <button type="button" class="pwd-toggle-btn" data-target="loginPassword"
+                aria-label="Toggle password visibility">
+                <i data-lucide="eye"></i>
+              </button>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block" id="loginSubmitBtn">
+            <i data-lucide="log-in"></i>
+            <span>Sign In to Dashboard</span>
+          </button>
+
+          <p class="auth-switch-text">
+            Don't have an account yet? <a href="javascript:void(0)" id="linkToRegister">Create Account with your Gmail</a>
+          </p>
+        </form>
+
+        <!-- REGISTER FORM (Strictly ₹ INR) -->
+        <form id="registerForm" class="auth-form hidden">
+          <div class="form-header">
+            <h3>Create an Account</h3>
+            <p>Start tracking your actual income and expenses in Indian Rupees (₹)</p>
+          </div>
+
+          <div class="form-group">
+            <label for="regName">Full Name</label>
+            <div class="input-with-icon">
+              <i data-lucide="user"></i>
+              <input type="text" id="regName" required autocomplete="name">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="regEmail">Email Address (Gmail)</label>
+            <div class="input-with-icon">
+              <i data-lucide="mail"></i>
+              <input type="email" id="regEmail" required autocomplete="email">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="regPassword">Password (minimum 6 characters)</label>
+            <div class="input-with-icon">
+              <i data-lucide="lock"></i>
+              <input type="password" id="regPassword" minlength="6" required autocomplete="new-password">
+              <button type="button" class="pwd-toggle-btn" data-target="regPassword"
+                aria-label="Toggle password visibility">
+                <i data-lucide="eye"></i>
+              </button>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block" id="registerSubmitBtn">
+            <i data-lucide="user-plus"></i>
+            <span>Create Free Account</span>
+          </button>
+
+          <p class="auth-switch-text">
+            Already have an account? <a href="javascript:void(0)" id="linkToLogin">Sign In with your Gmail</a>
+          </p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ======================================================================
+       MAIN DASHBOARD APPLICATION (Shown when logged in)
+       ====================================================================== -->
+  <div id="dashboardApp" class="dashboard-layout hidden">
+    <!-- Mobile Sidebar Backdrop -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+    <!-- ==================== LEFT SIDEBAR (All Buttons & Navigation) ==================== -->
+    <aside class="dashboard-sidebar" id="appSidebar">
+      <!-- Sidebar Brand -->
+      <div class="sidebar-brand">
+        <div class="brand-logo-icon">
+          <i data-lucide="wallet-cards"></i>
+        </div>
+        <div class="brand-text-block">
+          <h2>Paisa<span>Track</span></h2>
+          <span class="brand-sub-badge">₹ INR Financial OS</span>
+        </div>
+        <button class="sidebar-close-btn" id="closeSidebarBtn" aria-label="Close Sidebar">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+
+      <!-- Quick Action Buttons in Sidebar ("all buttons in the side bar") -->
+      <div class="sidebar-actions-group">
+        <span class="sidebar-section-title">Quick Actions</span>
+
+        <!-- 1. Daily Spending CTA -->
+        <button id="openDailySpendBtn" class="sidebar-action-btn daily-spend" title="Record Today's Daily Spend">
+          <i data-lucide="zap"></i>
+          <span>Daily Spend</span>
+        </button>
+
+        <!-- 2. Add Money (Income) CTA -->
+        <button id="openAddMoneyBtn" class="sidebar-action-btn income" title="Deposit / Add Money">
+          <i data-lucide="plus-circle"></i>
+          <span>Add Money</span>
+        </button>
+
+        <!-- 3. Add Expense CTA -->
+        <button id="openAddExpenseBtn" class="sidebar-action-btn expense" title="Record an Expense">
+          <i data-lucide="minus-circle"></i>
+          <span>Add Expense</span>
+        </button>
+      </div>
+
+      <!-- Main Navigation Links in Sidebar -->
+      <nav class="sidebar-nav" aria-label="Dashboard Navigation">
+        <span class="sidebar-section-title">Navigation</span>
+
+        <button class="sidebar-nav-btn nav-tab-btn active" data-view="overview">
+          <i data-lucide="layout-dashboard"></i>
+          <span>Dashboard Overview</span>
+        </button>
+        <button class="sidebar-nav-btn nav-tab-btn" data-view="analytics">
+          <i data-lucide="pie-chart"></i>
+          <span>Analytics & Charts</span>
+        </button>
+        <button class="sidebar-nav-btn nav-tab-btn" data-view="transactions">
+          <i data-lucide="receipt"></i>
+          <span>Spending History</span>
+        </button>
+        <button class="sidebar-nav-btn nav-tab-btn" data-view="budgets">
+          <i data-lucide="target"></i>
+          <span>Budgets & Goals</span>
+        </button>
+      </nav>
+
+      <!-- Financial Tools & Settings in Sidebar -->
+      <div class="sidebar-tools">
+        <span class="sidebar-section-title">Tools & Settings</span>
+
+        <button class="sidebar-tool-btn" id="openNetBalanceModalBtn">
+          <i data-lucide="scale"></i>
+          <span>Balance & Safety Net</span>
+        </button>
+        <button class="sidebar-tool-btn" id="exportCsvBtn">
+          <i data-lucide="download"></i>
+          <span>Export CSV Report</span>
+        </button>
+        <button class="sidebar-tool-btn" id="openProfileSettingsBtn">
+          <i data-lucide="settings"></i>
+          <span>Account Settings</span>
+        </button>
+      </div>
+
+      <!-- Sidebar Footer: Theme Toggle & User Info -->
+      <div class="sidebar-footer">
+        <div class="sidebar-theme-toggle">
+          <div class="theme-info">
+            <i data-lucide="palette"></i>
+            <span>Appearance</span>
+          </div>
+          <button id="themeToggleBtn" class="theme-switch-btn" title="Toggle Light/Dark Theme"
+            aria-label="Toggle Theme">
+            <i data-lucide="sun" class="sun-icon"></i>
+            <i data-lucide="moon" class="moon-icon"></i>
+          </button>
+        </div>
+
+        <div class="sidebar-user-profile">
+          <div class="user-avatar" id="navUserAvatar">U</div>
+          <div class="user-details-compact">
+            <span class="user-name-compact" id="navUserName">My Account</span>
+            <span class="user-email-compact" id="sidebarUserEmail">—</span>
+            <span id="menuUserName" style="display:none">User</span>
+            <span id="menuUserEmail" style="display:none"></span>
+            <span id="menuUserAvatar" style="display:none">U</span>
+            <div id="userDropdownMenu" style="display:none"></div>
+            <button id="userProfileBtn" style="display:none"></button>
+          </div>
+          <button class="sidebar-logout-btn" id="logoutBtn" title="Sign Out">
+            <i data-lucide="log-out"></i>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ==================== MAIN MIDDLE CONTENT WORKSPACE ==================== -->
+    <div class="dashboard-main-area">
+      <!-- Top Bar in Middle Area -->
+      <header class="dashboard-topbar">
+        <div class="topbar-left">
+          <button class="sidebar-mobile-toggle" id="sidebarToggleBtn" aria-label="Open Sidebar Menu">
+            <i data-lucide="menu"></i>
+          </button>
+          <div class="topbar-welcome">
+            <h2 id="welcomeGreeting">Welcome to PaisaTrack 👋</h2>
+            <span class="currency-tag">Exclusively Indian Rupees (₹)</span>
+          </div>
+        </div>
+        <div class="topbar-right">
+          <div class="topbar-net-pill" id="topbarBalancePill">
+            <span class="pill-label">Total Net Balance</span>
+            <strong class="pill-amount text-income" id="topbarNetBalance">₹0</strong>
+          </div>
+        </div>
+      </header>
+
+      <!-- Middle Page View Container -->
+      <main class="dashboard-page-content main-content">
+
+        <!-- ==================================================================
+             VIEW 1: DASHBOARD OVERVIEW
+             ================================================================== -->
+        <div id="view-overview" class="view-panel active">
+
+          <!-- ==================================================================
+             DAILY SPENDING MONEY QUICK-ADD & WHY SPEND WRITE OPTIONS
+             (Placed prominently at the top of the middle page)
+             ================================================================== -->
+          <section class="quick-daily-spend-card" id="quickDailySpendSection">
+            <div class="quick-spend-header">
+              <div class="quick-spend-title-group">
+                <span class="quick-spend-tag">
+                  <i data-lucide="zap"></i> Daily Spending
+                </span>
+                <h3>Quick Add Daily Spending Money</h3>
+                <p>Log what you spent today with reason & automatic balance recalculation</p>
+              </div>
+              <div class="quick-spend-date-badge">
+                <i data-lucide="calendar"></i>
+                <span id="quickSpendDateText">Today</span>
+              </div>
+            </div>
+
+            <form id="quickDailySpendForm" class="quick-spend-form">
+              <!-- Top Input Row: Amount, Category, Paid From -->
+              <div class="quick-spend-grid">
+                <!-- Amount Field -->
+                <div class="quick-field-group">
+                  <label for="quickSpendAmount">Amount (₹) *</label>
+                  <div class="amount-input-wrap">
+                    <span class="amount-currency-prefix">₹</span>
+                    <input type="number" id="quickSpendAmount" step="0.01" min="0.01" required>
+                  </div>
+                  <div class="quick-chips-row">
+                    <button type="button" class="quick-mini-chip" data-amt="20">+₹20</button>
+                    <button type="button" class="quick-mini-chip" data-amt="50">+₹50</button>
+                    <button type="button" class="quick-mini-chip" data-amt="100">+₹100</button>
+                    <button type="button" class="quick-mini-chip" data-amt="200">+₹200</button>
+                    <button type="button" class="quick-mini-chip" data-amt="500">+₹500</button>
+                  </div>
+                </div>
+
+                <!-- Category Field -->
+                <div class="quick-field-group">
+                  <label for="quickSpendCategory">Category *</label>
+                  <select id="quickSpendCategory" required>
+                    <option value="Food" selected>🍕 Food & Dining</option>
+                    <option value="Travel">🚗 Travel & Commute</option>
+                    <option value="Shopping">🛍️ Shopping</option>
+                    <option value="Bills">💡 Utilities & Bills</option>
+                    <option value="Entertainment">🎬 Entertainment</option>
+                    <option value="Health">💊 Health & Medical</option>
+                    <option value="Education">🎓 Education</option>
+                    <option value="Others">📦 Other Expenses</option>
+                  </select>
+                </div>
+
+                <!-- Paid From Pocket -->
+                <div class="quick-field-group">
+                  <label for="quickSpendPocket">Paid From *</label>
+                  <select id="quickSpendPocket">
+                    <option value="UPI" selected>📱 UPI (GPay/PhonePe)</option>
+                    <option value="Cash">💵 Cash in Hand</option>
+                    <option value="NetBanking">🏦 Bank Account</option>
+                    <option value="Card">💳 Credit / Debit Card</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Why Spend Money (Write options & quick chips) -->
+              <div class="quick-reason-block">
+                <label for="quickSpendReason" class="quick-reason-label">
+                  <span>Why did you spend this money? (Write reason / purpose) *</span>
+                  <span class="label-hint">Click a quick reason below or write your own</span>
+                </label>
+
+                <div class="quick-reason-input-row">
+                  <div class="reason-input-container">
+                    <i data-lucide="help-circle" class="input-icon"></i>
+                    <input type="text" id="quickSpendReason"
+                      required>
+                  </div>
+                  <button type="submit" class="btn btn-expense-glow quick-add-submit-btn" id="quickDailySpendBtn">
+                    <i data-lucide="plus-circle"></i>
+                    <span>Record Daily Spend</span>
+                  </button>
+                </div>
+
+                <!-- Quick Reasons Write Options -->
+                <div class="quick-write-options-row">
+                  <span class="options-tag-label">Quick Write Options:</span>
+                  <div class="quick-write-chips" id="quickWriteChipsContainer">
+                    <button type="button" class="write-option-chip" data-reason="🍽️ Lunch / Dinner">🍽️ Lunch /
+                      Dinner</button>
+                    <button type="button" class="write-option-chip" data-reason="☕ Chai & Snacks">☕ Chai &
+                      Snacks</button>
+                    <button type="button" class="write-option-chip" data-reason="🚕 Auto / Cab / Metro">🚕 Auto /
+                      Cab</button>
+                    <button type="button" class="write-option-chip" data-reason="🛒 Groceries Refill">🛒
+                      Groceries</button>
+                    <button type="button" class="write-option-chip" data-reason="💊 Medicine & Health">💊
+                      Medicine</button>
+                    <button type="button" class="write-option-chip" data-reason="🛍️ Quick Shopping">🛍️
+                      Shopping</button>
+                    <button type="button" class="write-option-chip" data-reason="💡 Bill / Recharge">💡
+                      Recharge</button>
+                    <button type="button" class="write-option-chip" data-reason="🎉 Outing / Friends">🎉 Outing</button>
+                    <button type="button" class="write-option-chip" data-reason="🎁 Family Help">🎁 Family Help</button>
+                    <button type="button" class="write-option-chip" data-reason="🚨 Urgent Expense">🚨 Urgent
+                      Need</button>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </section>
+
+          <!-- ==================================================================
+             TODAY'S END-OF-DAY SMART SUMMARY ("after the spending money")
+             ================================================================== -->
+          <section class="daily-insight-card" id="dailyInsightSection">
+            <div class="insight-glow"></div>
+            <div class="insight-content">
+              <div class="insight-header">
+                <div class="insight-tag">
+                  <i data-lucide="sparkles"></i>
+                  <span>Today's End-of-Day Smart Summary</span>
+                </div>
+                <div class="insight-date-picker">
+                  <label for="insightDatePicker" class="sr-only">Choose Summary Date</label>
+                  <input type="date" id="insightDatePicker" title="Inspect summary for any date">
+                </div>
+              </div>
+
+              <div class="insight-body">
+                <h2 id="insightHeadline" class="insight-headline">
+                  You spent ₹0 today.
+                </h2>
+                <p id="insightSubtext" class="insight-subtext">
+                  Add an expense or deposit money to start seeing your automatic spending insights.
+                </p>
+              </div>
+
+              <div class="insight-chips" id="insightChips">
+                <div class="insight-chip">
+                  <span class="chip-label">Today's Spend</span>
+                  <span class="chip-val" id="todaySpendVal">₹0</span>
+                </div>
+                <div class="insight-chip">
+                  <span class="chip-label">Top Category</span>
+                  <span class="chip-val highlight" id="todayTopCategory">None</span>
+                </div>
+                <div class="insight-chip">
+                  <span class="chip-label">Transactions</span>
+                  <span class="chip-val" id="todayTxnCount">0 entries</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- ================================================================
+             NET BALANCE & CASH FLOW COMMAND CENTER
+             ================================================================ -->
+          <section class="net-balance-hub card">
+            <div class="hub-header">
+              <div class="hub-title-group">
+                <div class="card-icon"><i data-lucide="scale"></i></div>
+                <div>
+                  <div class="hub-badge-row">
+                    <span class="hub-badge">Net Balance Command Center</span>
+                    <div class="safety-indicator" id="safetyIndicator">
+                      <i data-lucide="shield-check"></i>
+                      <span id="safetyIndicatorText">Safety Net: Active</span>
+                    </div>
+                  </div>
+                  <h3>Cash Flow & Net Balance Summary</h3>
+                </div>
+              </div>
+
+              <div class="hub-actions">
+                <!-- Quick Add Money CTA in Hub -->
+                <button class="btn btn-income-glow btn-sm" id="hubAddMoneyBtn">
+                  <i data-lucide="plus"></i>
+                  <span>Add Money</span>
+                </button>
+
+                <!-- Timeframe Selector -->
+                <div class="timeframe-pills" id="balanceTimeframePills">
+                  <button class="timeframe-pill active" data-timeframe="all">All-Time</button>
+                  <button class="timeframe-pill" data-timeframe="month">This Month</button>
+                  <button class="timeframe-pill" data-timeframe="year">This Year</button>
+                </div>
+                <button id="configureBalanceBtn" class="btn btn-secondary btn-sm"
+                  title="Configure Starting Balance & Safety Net">
+                  <i data-lucide="settings-2"></i>
+                  <span>Configure</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Main Net Balance Numbers Grid -->
+            <div class="hub-grid">
+              <!-- Left: Big Net Balance & Savings Rate -->
+              <div class="hub-main-stat">
+                <span class="hub-stat-label">Total Net Balance</span>
+                <div class="hub-main-number" id="hubNetBalanceVal">₹0</div>
+                <div class="hub-sub-info">
+                  <span class="cash-flow-tag positive" id="hubCashFlowTag">
+                    <i data-lucide="trending-up"></i> Net Balance
+                  </span>
+                  <span class="hub-opening-note" id="hubOpeningNote">+₹0 starting balance</span>
+                </div>
+
+                <!-- Savings Rate Progress Bar -->
+                <div class="savings-rate-box">
+                  <div class="savings-rate-head">
+                    <span>Net Savings Rate</span>
+                    <strong id="savingsRateVal">0%</strong>
+                  </div>
+                  <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="savingsRateBar" style="width: 0%;"></div>
+                  </div>
+                  <span class="savings-rate-sub" id="savingsRateSub">Add income to see your savings rate</span>
+                </div>
+              </div>
+
+              <!-- Middle: Cash Flow Columns (Inflow vs Outflow) -->
+              <div class="hub-cash-flow">
+                <div class="flow-box inflow">
+                  <div class="flow-icon"><i data-lucide="arrow-down-left"></i></div>
+                  <div>
+                    <span class="flow-label">Total Money In (Income)</span>
+                    <h4 class="flow-amt text-income" id="hubInflowVal">₹0</h4>
+                    <span class="flow-count" id="hubInflowCount">0 deposits</span>
+                  </div>
+                </div>
+
+                <div class="flow-box outflow">
+                  <div class="flow-icon"><i data-lucide="arrow-up-right"></i></div>
+                  <div>
+                    <span class="flow-label">Total Money Out (Spent)</span>
+                    <h4 class="flow-amt text-expense" id="hubOutflowVal">₹0</h4>
+                    <span class="flow-count" id="hubOutflowCount">0 expenses</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right: Run Rate & Projections -->
+              <div class="hub-projections">
+                <div class="projection-item">
+                  <span class="projection-label">Daily Burn Rate</span>
+                  <h4 class="projection-val" id="dailyBurnRateVal">₹0/day</h4>
+                  <span class="projection-desc">Average spending velocity</span>
+                </div>
+                <div class="projection-item">
+                  <span class="projection-label">Month-End Projected Balance</span>
+                  <h4 class="projection-val text-accent" id="projectedMonthEndVal">₹0</h4>
+                  <span class="projection-desc" id="projectedMonthEndDesc">At current spending velocity</span>
+                </div>
+                <div class="projection-item">
+                  <span class="projection-label">Safety Net Target</span>
+                  <h4 class="projection-val" id="minBalanceTargetVal">₹0</h4>
+                  <span class="projection-desc" id="minBalanceStatusDesc">Minimum threshold alert</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Pocket Balances Breakdown (Payment Mode Accounts) -->
+            <div class="pocket-breakdown-section">
+              <div class="pocket-header">
+                <div>
+                  <h4>Balances Across Pockets & Accounts</h4>
+                  <span class="pocket-sub">Money is automatically allocated to your selected account upon deposit</span>
+                </div>
+              </div>
+              <div class="pocket-grid" id="pocketGrid">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+          </section>
+
+          <!-- Key Financial Spending Metrics -->
+          <section class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon-wrap text-expense">
+                <i data-lucide="calendar-check"></i>
+              </div>
+              <div class="stat-info">
+                <span class="stat-label">Today's Spending</span>
+                <h3 class="stat-value" id="statTodaySpend">₹0</h3>
+                <span class="stat-sub" id="statTodayDate">Today</span>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon-wrap text-warning">
+                <i data-lucide="calendar-days"></i>
+              </div>
+              <div class="stat-info">
+                <span class="stat-label">Weekly Spending</span>
+                <h3 class="stat-value" id="statWeeklySpend">₹0</h3>
+                <span class="stat-sub">Last 7 Days</span>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon-wrap text-accent">
+                <i data-lucide="calendar-range"></i>
+              </div>
+              <div class="stat-info">
+                <span class="stat-label">Monthly Spending</span>
+                <h3 class="stat-value" id="statMonthlySpend">₹0</h3>
+                <span class="stat-sub" id="statCurrentMonth">This Month</span>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon-wrap" style="color: var(--brand-primary);">
+                <i data-lucide="piggy-bank"></i>
+              </div>
+              <div class="stat-info">
+                <span class="stat-label">Monthly Savings</span>
+                <h3 class="stat-value text-income" id="statMonthlySavings">₹0</h3>
+                <span class="stat-sub" id="statMonthlySavingsRate">Net Surplus</span>
+              </div>
+            </div>
+          </section>
+
+          <!-- Dashboard Two-Column: Budget Card & Quick Recent Transactions -->
+          <section class="dashboard-row">
+            <!-- Monthly Budget Overview -->
+            <div class="card budget-card">
+              <div class="card-header">
+                <div class="card-title-group">
+                  <div class="card-icon"><i data-lucide="target"></i></div>
+                  <div>
+                    <h3>Monthly Budget Tracker</h3>
+                    <p class="card-subtitle">Spending limit vs actual expenses</p>
+                  </div>
+                </div>
+                <button id="overviewEditBudgetBtn" class="btn btn-secondary btn-sm">
+                  <i data-lucide="sliders-horizontal"></i>
+                  <span>Set Budget</span>
+                </button>
+              </div>
+
+              <div class="budget-body">
+                <div class="budget-overview">
+                  <div class="budget-numbers">
+                    <div>
+                      <span class="budget-metric-label">Spent This Month</span>
+                      <div class="budget-metric-val" id="budgetSpentVal">₹0</div>
+                    </div>
+                    <div class="text-right">
+                      <span class="budget-metric-label">Monthly Target</span>
+                      <div class="budget-metric-val" id="budgetTargetVal">₹15,000</div>
+                    </div>
+                  </div>
+
+                  <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="budgetProgressBar" style="width: 0%;"></div>
+                  </div>
+
+                  <div class="budget-status-row">
+                    <span class="status-badge" id="budgetStatusBadge">
+                      <i data-lucide="shield-check"></i> On Track (0% Used)
+                    </span>
+                    <span class="budget-remaining-text" id="budgetRemainingText">₹15,000 remaining</span>
+                  </div>
+                </div>
+
+                <!-- Top categories mini-list -->
+                <div class="category-budget-breakdown">
+                  <h4>Top Categories This Month</h4>
+                  <div class="cat-budget-list" id="catBudgetList"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Recent Transactions Widget -->
+            <div class="card recent-txns-card">
+              <div class="card-header">
+                <div class="card-title-group">
+                  <div class="card-icon"><i data-lucide="clock"></i></div>
+                  <div>
+                    <h3>Recent Activity</h3>
+                    <p class="card-subtitle">Latest income & expense entries</p>
+                  </div>
+                </div>
+                <button class="btn btn-ghost btn-sm" id="viewAllTxnsBtn">
+                  <span>View All</span>
+                  <i data-lucide="arrow-right"></i>
+                </button>
+              </div>
+
+              <div class="recent-txns-list" id="recentTxnsList">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+          </section>
+
+        </div>
+
+        <!-- ==================================================================
+           VIEW 2: ANALYTICS & CHARTS
+           ================================================================== -->
+        <div id="view-analytics" class="view-panel">
+
+          <div class="dashboard-row">
+            <!-- Expense Category Breakdown Chart -->
+            <div class="card chart-card">
+              <div class="card-header">
+                <div class="card-title-group">
+                  <div class="card-icon"><i data-lucide="pie-chart"></i></div>
+                  <div>
+                    <h3>Category Spending Breakdown</h3>
+                    <p class="card-subtitle">Visual analysis of where money flows</p>
+                  </div>
+                </div>
+                <div class="chart-timeframe-pill">
+                  <select id="categoryChartFilter" class="compact-select">
+                    <option value="month" selected>This Month</option>
+                    <option value="all">All Time</option>
+                    <option value="week">This Week</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="chart-container" style="position: relative; height: 280px;">
+                <canvas id="categoryDoughnutChart"></canvas>
+                <div id="noCategoryData" class="chart-empty-state">
+                  <i data-lucide="receipt"></i>
+                  <p>No expense data recorded yet. Add your first expense to see the breakdown.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Category Legend with totals -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title-group">
+                  <div class="card-icon"><i data-lucide="layers"></i></div>
+                  <div>
+                    <h3>Category Distribution</h3>
+                    <p class="card-subtitle">Ranked by highest expense</p>
+                  </div>
+                </div>
+              </div>
+              <div class="analytics-cat-list" id="analyticsCatList">
+                <!-- Populated dynamically -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Trends Chart Section with Net Balance Trajectory Tab -->
+          <section class="card full-width-card mt-4">
+            <div class="card-header">
+              <div class="card-title-group">
+                <div class="card-icon"><i data-lucide="trending-up"></i></div>
+                <div>
+                  <h3>Financial Trends & Net Balance Trajectory</h3>
+                  <p class="card-subtitle">Explore daily expenses, monthly cash flow, and cumulative balance growth</p>
+                </div>
+              </div>
+              <div class="chart-tabs">
+                <button class="chart-tab active" data-chart="daily">Daily Trend (Last 14 Days)</button>
+                <button class="chart-tab" data-chart="monthly">Monthly Comparison</button>
+                <button class="chart-tab" data-chart="cumulative">Cumulative Net Balance Curve</button>
+              </div>
+            </div>
+            <div class="chart-container-large" style="position: relative; height: 320px;">
+              <canvas id="spendingTrendsChart"></canvas>
+            </div>
+          </section>
+
+        </div>
+
+        <!-- ==================================================================
+           VIEW 3: TRANSACTIONS HISTORY & MANAGEMENT
+           ================================================================== -->
+        <div id="view-transactions" class="view-panel">
+
+          <section class="card history-card" id="historySection">
+            <div class="card-header flex-wrap-header">
+              <div class="card-title-group">
+                <div class="card-icon"><i data-lucide="history"></i></div>
+                <div>
+                  <h3>Spending History & Transactions</h3>
+                  <p class="card-subtitle" id="historyCounter">Showing 0 transactions</p>
+                </div>
+              </div>
+
+              <!-- Actions Toolbar -->
+              <div class="history-actions">
+                <button id="quickAddMoneyTableBtn" class="btn btn-income-glow btn-sm">
+                  <i data-lucide="plus-circle"></i>
+                  <span>Add Money</span>
+                </button>
+                <button id="quickAddExpenseTableBtn" class="btn btn-expense-glow btn-sm">
+                  <i data-lucide="minus-circle"></i>
+                  <span>Add Expense</span>
+                </button>
+                <button id="exportCsvBtn" class="btn btn-outline btn-sm" title="Download Report as CSV">
+                  <i data-lucide="download"></i>
+                  <span>Export CSV</span>
+                </button>
+                <button id="loadDemoDataBtn" class="btn btn-ghost btn-sm"
+                  title="Load sample transactions if you wish to preview with demo data">
+                  <i data-lucide="wand-2"></i>
+                  <span>Sample Data</span>
+                </button>
+                <button id="clearAllDataBtn" class="btn btn-ghost-danger btn-sm"
+                  title="Reset all transactions back to clean ₹0">
+                  <i data-lucide="trash-2"></i>
+                  <span>Reset to ₹0</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Filter & Search Controls Bar -->
+            <div class="filters-bar">
+              <div class="search-box">
+                <i data-lucide="search" class="search-icon"></i>
+                <input type="text" id="searchInput">
+              </div>
+
+              <div class="filter-group">
+                <select id="filterType" class="filter-select">
+                  <option value="all">All Types</option>
+                  <option value="expense">Expenses Only</option>
+                  <option value="income">Income Only</option>
+                </select>
+
+                <select id="filterCategory" class="filter-select">
+                  <option value="all">All Categories</option>
+                  <option value="Food">🍕 Food & Dining</option>
+                  <option value="Travel">🚗 Travel & Commute</option>
+                  <option value="Shopping">🛍️ Shopping</option>
+                  <option value="Education">🎓 Education</option>
+                  <option value="Bills">💡 Bills & Utilities</option>
+                  <option value="Entertainment">🎬 Entertainment</option>
+                  <option value="Health">💊 Health & Medical</option>
+                  <option value="Salary">💼 Salary / Wages</option>
+                  <option value="Freelance">💻 Freelance & Business</option>
+                  <option value="Investments">📈 Investments & Returns</option>
+                  <option value="Gifts">🎁 Gifts & Allowance</option>
+                  <option value="Others">📦 Other</option>
+                </select>
+
+                <select id="sortBy" class="filter-select">
+                  <option value="date-desc">Date (Newest First)</option>
+                  <option value="date-asc">Date (Oldest First)</option>
+                  <option value="amount-desc">Amount (Highest First)</option>
+                  <option value="amount-asc">Amount (Lowest First)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Transactions Table -->
+            <div class="table-responsive">
+              <table class="transaction-table" id="transactionTable">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Category</th>
+                    <th>Why Spent (Reason)</th>
+                    <th>Description / Merchant</th>
+                    <th>Account / Pocket</th>
+                    <th>Amount (₹)</th>
+                    <th class="text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="transactionListBody">
+                  <!-- Dynamically populated -->
+                </tbody>
+              </table>
+
+              <!-- Clean Empty State -->
+              <div id="emptyHistoryState" class="empty-state">
+                <div class="empty-icon-wrap">
+                  <i data-lucide="wallet"></i>
+                </div>
+                <h4>No transactions yet</h4>
+                <p>Your tracker is clean and ready. Add money or record an expense to start tracking your daily finances
+                  in ₹.</p>
+                <div class="empty-state-buttons">
+                  <button class="btn btn-income-glow btn-sm" onclick="openTransactionModalWithType('income')">
+                    <i data-lucide="plus"></i> Add Money
+                  </button>
+                  <button class="btn btn-expense-glow btn-sm" onclick="openTransactionModalWithType('expense')">
+                    <i data-lucide="minus"></i> Add Expense
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+        </div>
+
+        <!-- ==================================================================
+           VIEW 4: BUDGETS & SAVINGS GOALS
+           ================================================================== -->
+        <div id="view-budgets" class="view-panel">
+
+          <div class="dashboard-row">
+            <!-- Budget Settings Card -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title-group">
+                  <div class="card-icon"><i data-lucide="sliders"></i></div>
+                  <div>
+                    <h3>Monthly Budget Configuration</h3>
+                    <p class="card-subtitle">Set your overall monthly target and rules in ₹</p>
+                  </div>
+                </div>
+              </div>
+
+              <form id="inlineBudgetForm" class="budget-setup-form">
+                <div class="form-group">
+                  <label for="budgetConfigInput">Monthly Maximum Spending (₹)</label>
+                  <div class="amount-input-wrap">
+                    <span class="amount-currency-prefix">₹</span>
+                    <input type="number" id="budgetConfigInput" min="500" step="500" value="15000" required>
+                  </div>
+                </div>
+
+                <div class="budget-guide-box mt-3">
+                  <i data-lucide="check-circle-2"></i>
+                  <div>
+                    <strong>Automatic Budget Tracking:</strong>
+                    <p>Whenever you add an expense, PaisaTrack updates your budget progress bar, remaining allowance,
+                      and percentage used automatically.</p>
+                  </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary mt-3">
+                  <i data-lucide="save"></i>
+                  <span>Save Budget Settings</span>
+                </button>
+              </form>
+            </div>
+
+            <!-- Savings Goals Tracker -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title-group">
+                  <div class="card-icon"><i data-lucide="award"></i></div>
+                  <div>
+                    <h3>Savings Goals</h3>
+                    <p class="card-subtitle">Track targets for dream purchases & emergencies in ₹</p>
+                  </div>
+                </div>
+                <button id="openAddGoalBtn" class="btn btn-secondary btn-sm">
+                  <i data-lucide="plus"></i>
+                  <span>New Goal</span>
+                </button>
+              </div>
+
+              <div class="goals-container" id="goalsContainer">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </main>
+
+      <!-- Footer -->
+      <footer class="app-footer">
+        <p>💸 PaisaTrack &bull; Real-Time ₹ INR Expense & Net Balance Intelligence &bull; Completely client-side &
+          secure</p>
+      </footer>
+    </div> <!-- /dashboard-main-area -->
+  </div> <!-- /dashboardApp -->
+
+  <!-- ==================== MODAL: ADD / EDIT TRANSACTION ==================== -->
+  <div class="modal-backdrop" id="transactionModal" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <div class="modal-icon" id="modalHeaderIcon"><i data-lucide="receipt"></i></div>
+          <h3 id="modalTitle">Record Transaction</h3>
+        </div>
+        <button class="close-modal-btn" id="closeTxnModalBtn" aria-label="Close dialog">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+
+      <form id="transactionForm" class="modal-form">
+        <input type="hidden" id="editTxnId" value="">
+
+        <!-- Type Selector Tabs (Expense vs Income / Add Money) -->
+        <div class="form-type-toggle">
+          <label class="type-pill">
+            <input type="radio" name="txnType" value="income">
+            <span class="type-pill-btn income-btn">
+              <i data-lucide="arrow-down-left"></i> Add Money (Income)
+            </span>
+          </label>
+          <label class="type-pill">
+            <input type="radio" name="txnType" value="expense" checked>
+            <span class="type-pill-btn expense-btn">
+              <i data-lucide="arrow-up-right"></i> Add Expense
+            </span>
+          </label>
+        </div>
+
+        <!-- Amount Input (₹ prefix) -->
+        <div class="form-group">
+          <label for="txnAmount">Amount (₹) *</label>
+          <div class="amount-input-wrap">
+            <span class="amount-currency-prefix">₹</span>
+            <input type="number" id="txnAmount" step="0.01" min="0.01" required>
+          </div>
+          <!-- Quick Amount Buttons -->
+          <div class="quick-amounts" id="quickAmountsContainer">
+            <button type="button" class="quick-amount-chip" data-add="100">+100</button>
+            <button type="button" class="quick-amount-chip" data-add="500">+500</button>
+            <button type="button" class="quick-amount-chip" data-add="1000">+1000</button>
+            <button type="button" class="quick-amount-chip" data-add="5000">+5000</button>
+            <button type="button" class="quick-amount-chip" data-add="10000">+10000</button>
+          </div>
+        </div>
+
+        <!-- Category & Date Row -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="txnCategory" id="categoryLabel">Category *</label>
+            <select id="txnCategory" required>
+              <!-- Dynamically populated based on Income vs Expense -->
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="txnDate">Date *</label>
+            <input type="date" id="txnDate" required>
+          </div>
+        </div>
+
+        <!-- Dedicated Why Spend Money (Reason / Purpose) & Quick Write Options -->
+        <div class="form-group" id="whySpendGroup">
+          <label for="txnReason" class="label-with-hint">
+            <span id="txnReasonLabel">Why did you spend this money? (Reason / Purpose) *</span>
+            <span class="label-hint">Click a quick reason below or write your own</span>
+          </label>
+          <input type="text" id="txnReason" required>
+
+          <div class="modal-reason-options" id="modalReasonOptions">
+            <button type="button" class="modal-reason-btn" data-reason="🍽️ Lunch / Dinner">🍽️ Lunch / Dinner</button>
+            <button type="button" class="modal-reason-btn" data-reason="☕ Chai & Snacks">☕ Chai & Snacks</button>
+            <button type="button" class="modal-reason-btn" data-reason="🚕 Auto / Cab / Metro">🚕 Auto / Cab</button>
+            <button type="button" class="modal-reason-btn" data-reason="🛒 Groceries Refill">🛒 Groceries</button>
+            <button type="button" class="modal-reason-btn" data-reason="💊 Medicine & Health">💊 Medicine</button>
+            <button type="button" class="modal-reason-btn" data-reason="🛍️ Quick Shopping">🛍️ Shopping</button>
+            <button type="button" class="modal-reason-btn" data-reason="💡 Bill / Recharge">💡 Recharge</button>
+            <button type="button" class="modal-reason-btn" data-reason="🎉 Outing / Friends">🎉 Outing</button>
+            <button type="button" class="modal-reason-btn" data-reason="🎁 Family Help">🎁 Family Help</button>
+            <button type="button" class="modal-reason-btn" data-reason="🚨 Urgent Expense">🚨 Urgent Need</button>
+          </div>
+        </div>
+
+        <!-- Description & Payment Method Row -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="txnDesc">Merchant / Additional Detail (Optional)</label>
+            <input type="text" id="txnDesc">
+          </div>
+
+          <div class="form-group">
+            <label for="txnPaymentMode" id="paymentModeLabel">Account / Pocket *</label>
+            <select id="txnPaymentMode">
+              <option value="NetBanking">🏦 Bank Account</option>
+              <option value="UPI" selected>📱 UPI (GPay/PhonePe/Paytm)</option>
+              <option value="Cash">💵 Cash in Hand</option>
+              <option value="Card">💳 Credit / Debit Card</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="cancelTxnBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="saveTxnBtn">
+            <i data-lucide="check"></i>
+            <span id="saveTxnBtnText">Save & Auto-Calculate</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL: CONFIGURE NET BALANCE & SAFETY NET ==================== -->
+  <div class="modal-backdrop" id="netBalanceModal" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <div class="modal-icon"><i data-lucide="scale"></i></div>
+          <h3>Starting Balance & Safety Net (₹)</h3>
+        </div>
+        <button class="close-modal-btn" id="closeNetBalanceModalBtn" aria-label="Close dialog">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+
+      <form id="netBalanceForm" class="modal-form">
+        <div class="form-group">
+          <label for="openingBalanceInput">Initial Starting / Opening Balance (₹) *</label>
+          <div class="amount-input-wrap">
+            <span class="amount-currency-prefix">₹</span>
+            <input type="number" id="openingBalanceInput" step="100" value="0" required>
+          </div>
+          <small class="form-hint">Your pre-existing bank balance before tracking in PaisaTrack. Leave at 0 if starting
+            fresh.</small>
+        </div>
+
+        <div class="form-group">
+          <label for="minBalanceAlertInput">Safety Net Alert Threshold (₹) *</label>
+          <div class="amount-input-wrap">
+            <span class="amount-currency-prefix">₹</span>
+            <input type="number" id="minBalanceAlertInput" min="0" step="100" value="0" required>
+          </div>
+          <small class="form-hint">PaisaTrack will alert you if your net balance drops below this emergency
+            threshold.</small>
+        </div>
+
+        <div class="budget-guide-box">
+          <i data-lucide="shield-alert"></i>
+          <div>
+            <strong>How Everything Adds Up Automatically:</strong>
+            <p><strong>Net Balance = Starting Balance + All Money Added - All Expenses</strong>. Whenever you add or
+              spend money, every pocket, metric, chart, and daily summary recalculates itself instantly.</p>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="cancelNetBalanceBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary">
+            <i data-lucide="save"></i> Save Settings
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL: SET BUDGET ==================== -->
+  <div class="modal-backdrop" id="budgetModal" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <div class="modal-icon"><i data-lucide="target"></i></div>
+          <h3>Monthly Budget Settings (₹)</h3>
+        </div>
+        <button class="close-modal-btn" id="closeBudgetModalBtn" aria-label="Close dialog">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+
+      <form id="budgetForm" class="modal-form">
+        <div class="form-group">
+          <label for="monthlyBudgetInput">Total Monthly Budget Limit (₹) *</label>
+          <div class="amount-input-wrap">
+            <span class="amount-currency-prefix">₹</span>
+            <input type="number" id="monthlyBudgetInput" min="100" step="100" required>
+          </div>
+          <small class="form-hint">Set the maximum spending limit you want to stay within each month.</small>
+        </div>
+
+        <div class="budget-guide-box">
+          <i data-lucide="info"></i>
+          <div>
+            <strong>Smart Tip:</strong>
+            <p>If your spending exceeds 80% of your budget, PaisaTrack will trigger an alert banner so you never
+              overspend.</p>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="cancelBudgetBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary">
+            <i data-lucide="save"></i> Update Budget
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL: ADD / EDIT SAVINGS GOAL ==================== -->
+  <div class="modal-backdrop" id="goalModal" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <div class="modal-icon"><i data-lucide="award"></i></div>
+          <h3>Add New Savings Goal (₹)</h3>
+        </div>
+        <button class="close-modal-btn" id="closeGoalModalBtn" aria-label="Close dialog">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+
+      <form id="goalForm" class="modal-form">
+        <div class="form-group">
+          <label for="goalTitle">Goal Title *</label>
+          <input type="text" id="goalTitle" required>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="goalTarget">Target Amount (₹) *</label>
+            <input type="number" id="goalTarget" min="100" step="100" required>
+          </div>
+          <div class="form-group">
+            <label for="goalCurrent">Current Saved (₹)</label>
+            <input type="number" id="goalCurrent" min="0" step="50" value="0" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="goalIcon">Goal Icon / Emoji</label>
+          <select id="goalIcon">
+            <option value="🏖️">🏖️ Vacation / Travel</option>
+            <option value="🛡️">🛡️ Emergency Fund</option>
+            <option value="💻">💻 Tech / Gadget</option>
+            <option value="🚗">🚗 Vehicle / Car</option>
+            <option value="🏠">🏠 House / Rent Deposit</option>
+            <option value="🎓">🎓 Education / Skills</option>
+            <option value="💍">💍 Wedding / Celebration</option>
+          </select>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="cancelGoalBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary">
+            <i data-lucide="check"></i> Create Goal
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL: ACCOUNT SETTINGS ==================== -->
+  <div class="modal-backdrop" id="profileModal" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <div class="modal-icon"><i data-lucide="user-cog"></i></div>
+          <h3>Account Settings</h3>
+        </div>
+        <button class="close-modal-btn" id="closeProfileModalBtn" aria-label="Close dialog">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+
+      <form id="profileForm" class="modal-form">
+        <div class="form-group">
+          <label for="profileName">Full Name</label>
+          <input type="text" id="profileName" required>
+        </div>
+
+        <div class="form-group">
+          <label for="profileEmail">Email Address (Read only)</label>
+          <input type="email" id="profileEmail" readonly disabled style="opacity: 0.7;">
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="cancelProfileBtn">Cancel</button>
+          <button type="button" class="btn btn-secondary" id="profileLogoutBtn" style="color: var(--color-expense);"><i data-lucide="log-out"></i> Sign Out</button>
+          <button type="submit" class="btn btn-primary">
+            <i data-lucide="save"></i> Save Profile
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+  <!-- App Script -->
+  <script src="app.js"></script>
+</body>
+
+</html>

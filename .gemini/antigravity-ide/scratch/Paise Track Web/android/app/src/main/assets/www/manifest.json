@@ -1,0 +1,19 @@
+{
+  "name": "PaisaTrack — Daily Expense Tracker & Net Balance Dashboard",
+  "short_name": "PaisaTrack",
+  "description": "Daily expense tracker and net cash-flow manager in Indian Rupees (₹)",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#FBF6EF",
+  "theme_color": "#3A2618",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
